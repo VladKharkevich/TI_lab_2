@@ -1,0 +1,181 @@
+<BtnOpenFile@Button>:
+	font_size: '22sp'
+	size_hint: 0.2, 0.28
+	pos_hint: {'top': 0.635}
+	text: '...'
+
+<ItemLabel@Label>:
+	font_size: '18sp'
+	halign: 'right'
+	valign: 'middle'
+
+
+<MyTextInput@TextInput>
+	font_size: '20sp'
+	size_hint_y: 0.3
+	multiline: False
+	readonly: True
+
+<MainScreen>:
+	size_hint_x: 0.9
+	size_hint_y: 0.97
+	pos_hint: {'center_x': 0.5, 'top': 1}
+	container: container
+
+	Container:
+		id: container
+		orientation: 'vertical'
+		halign: 'center'
+
+		input_file_name: input_file_name
+		key: key
+		type_of_code: type_of_code
+		lbl_error_file: lbl_error_file
+		lbl_error_key: lbl_error_key
+		output_text: output_text
+		output_key: output_key
+		input_text: input_text
+		lbl_register: lbl_register
+		lbl_len: lbl_len 
+
+		BoxLayout:
+
+			ItemLabel:
+				text: 'Исходный файл'
+			
+			BoxLayout:
+				orientation: 'vertical'
+
+				Widget:
+					size_hint_y: 0.4
+
+				MyTextInput:
+					id: input_file_name
+					pos_hint: {'center': 0}
+					on_text:
+						root.container.lbl_error_file.color = (0, 0, 0, 1)
+					
+				Label:
+					id: lbl_error_file
+					text: 'Файл не найден!'
+					color: (0, 0, 0, 1)
+					size_hint_y: 0.2
+
+				Widget:
+					size_hint_y: 0.2
+					
+
+			BtnOpenFile:
+				id: btn_open_file
+				on_release:
+					root.manager.current = 'filechooser'
+					root.manager.get_screen('filechooser').choosing_file.path = self.get_path()
+					root.manager.get_screen('filechooser').choosing_file.selection = []
+					
+
+			MethodSpinner:
+				pos_hint: {'top': 0.635}
+				size_hint_y: 0.3
+				valign: 'middle'
+				text: 'LFSR'
+				values: 'LFSR', 'RC4'
+				id: type_of_code
+				on_text:
+					self.clean_input()
+
+		BoxLayout:
+
+			ItemLabel:
+				id: lbl_register
+				text: 'Начальное состояние регистра'
+				pos_hint: {'right': 1}
+
+			ItemLabel:
+				id: lbl_len
+				text: '(%d из 29)' % len(root.container.key.text)
+				size_hint_x: .2
+				on_text: root.container.change_text()
+
+			Widget:
+				size_hint_x: .03
+
+			BoxLayout:
+				orientation: 'vertical'
+
+				Widget:
+					size_hint_y: 0.4
+
+				InputKey:
+					font_size: '18sp'
+					size_hint_y: 0.25
+					multiline: False
+					pos_hint: {'top': 0.6}
+					id: key
+					on_text:
+						root.container.lbl_error_key.color = (0, 0, 0, 1)
+
+				Label:
+					id: lbl_error_key
+					text: 'Ключ неверный!'
+					color: (0, 0, 0, 1)
+					size_hint_y: 0.2
+
+				Widget:
+					size_hint_y: 0.2
+
+		BoxLayout:
+			spacing: 6
+
+			BoxLayout:
+				orientation: 'vertical'
+				
+				ItemLabel:
+					size_hint_y: 0.2
+					text: 'Исходный текст'
+				
+				TextInput:
+					id: input_text
+					readonly: True
+
+			Button:
+				size_hint: 1, 0.3
+				pos_hint: {'top': 0.5}
+				text: 'Решить'
+				on_release:
+					root.container.start()
+
+		BoxLayout:
+
+			BoxLayout:
+				orientation: 'vertical'
+				
+				ItemLabel:
+					size_hint_y: 0.2
+					text: 'Ключ'
+				
+				TextInput:
+					id: output_key
+					readonly: True
+
+			BoxLayout:
+				orientation: 'vertical'
+
+				ItemLabel:
+					size_hint_y: 0.2
+					text: 'Конечный текст'
+				
+				TextInput:
+					id: output_text
+					readonly: True
+
+		
+
+
+<FileChooserScreen>:
+
+	choosing_file: choosing_file
+
+	ChoosingFile:
+		id: choosing_file
+		on_selection:
+			self.fill_text()
